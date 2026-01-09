@@ -21,20 +21,14 @@ let greens = 0;
 let reds = 0;
 
 // ===============================
-// COMANDOS MANUAIS
+// COMANDOS PRIVADOS (NÃO PUBLICA NO CANAL)
 // ===============================
 bot.onText(/\/green/, (msg) => {
   greens++;
-  bot.sendMessage(CHANNEL_ID, "🟢 GREEN");
 });
 
 bot.onText(/\/red/, (msg) => {
   reds++;
-  bot.sendMessage(CHANNEL_ID, "🔴 RED");
-});
-
-bot.onText(/\/resultado/, (msg) => {
-  enviarResultados();
 });
 
 // ===============================
@@ -46,45 +40,59 @@ function enviarResultados() {
     total === 0 ? 0 : ((greens / total) * 100).toFixed(0);
 
   const mensagem = `
-📊 *Resultados do dia*
+📊 RESULTADOS DO DIA
+
 🟢 Greens: ${greens}
 🔴 Reds: ${reds}
-🎯 Assertividade: ${assertividade}%
+📈 Assertividade: ${assertividade}%
+
+Seguimos focados e disciplinados.
 `;
 
-  bot.sendMessage(CHANNEL_ID, mensagem, { parse_mode: "Markdown" });
+  bot.sendMessage(CHANNEL_ID, mensagem);
 }
 
 // ===============================
-// CRON — RESULTADOS AUTOMÁTICOS
+// CRONS (HORA PORTUGAL - UTC)
 // ===============================
-// Ajusta o horário se quiseres
-cron.schedule("0 23 * * *", () => {
-  enviarResultados();
 
-  // reset para o dia seguinte
+// Bom dia — 09:00
+cron.schedule("0 9 * * *", () => {
+  bot.sendMessage(
+    CHANNEL_ID,
+    "🌅 Bom dia!\nFica atento aos sinais do Radar de Golos."
+  );
+});
+
+// Lembrete — 12:30
+cron.schedule("30 12 * * *", () => {
+  bot.sendMessage(
+    CHANNEL_ID,
+    "🔔 Atenção\nFica atento aos próximos sinais do Radar de Golos."
+  );
+});
+
+// Lembrete extra — 13:30
+cron.schedule("30 13 * * *", () => {
+  bot.sendMessage(
+    CHANNEL_ID,
+    "📢 Aviso\nOs sinais do Radar de Golos serão publicados em breve."
+  );
+});
+
+// Resultados do dia — 00:00
+cron.schedule("0 0 * * *", () => {
+  enviarResultados();
   greens = 0;
   reds = 0;
 });
 
-// ===============================
-// BOM DIA / LEMBRETE
-// ===============================
-cron.schedule("0 10 * * *", () => {
-  bot.sendMessage(
-    CHANNEL_ID,
-    "☀️ Bom dia!\nFica atento aos sinais de hoje 🎯⚽"
-  );
-});
-
-// ===============================
-// BOA NOITE
-// ===============================
-cron.schedule("0 0 * * *", () => {
+// Boa noite — 01:00
+cron.schedule("0 1 * * *", () => {
   bot.sendMessage(
     CHANNEL_ID,
     "🌙 Boa noite!\nObrigado por acompanharem 💙"
   );
 });
 
-console.log("🤖 Bot online");
+console.log("🤖 Bot online e a funcionar");
