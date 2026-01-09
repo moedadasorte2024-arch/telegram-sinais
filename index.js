@@ -1,58 +1,109 @@
 import TelegramBot from "node-telegram-bot-api";
 import cron from "node-cron";
 
-const token = process.env.BOT_TOKEN;
-const channelId = "@radardegolos";
+// ==================
+// CONFIGURAÇÃO
+// ==================
+const BOT_TOKEN = process.env.BOT_TOKEN || "8576458884:AAGkn2Nrt2zY-56h-e1GaE12xnvogz12r90";
+const CHANNEL_ID = "@radardegolos";
 
-if (!token) {
-  console.error("BOT_TOKEN não definido");
-  process.exit(1);
-}
+const bot = new TelegramBot(BOT_TOKEN, { polling: false });
 
-const bot = new TelegramBot(token, { polling: false });
+// ==================
+// MENSAGENS
+// ==================
 
-console.log("🤖 Bot iniciado com sucesso");
+// BOM DIA — 09:00 (com rotação)
+const bomDiaMsgs = [
+`☀️ BOM DIA
 
-// =====================
-// MENSAGENS AUTOMÁTICAS
-// =====================
+Análises em andamento.
+Sinais ao longo do dia.`,
 
-// 09:00 — Bom dia
+`☀️ BOM DIA
+
+Mercado em observação.
+Sinais durante o dia.`,
+
+`☀️ BOM DIA
+
+Jogos em análise.
+Sinais mais tarde.`
+];
+
+// LEMBRETE — 12:30
+const lembrete = `⏰ LEMBRETE
+
+Mercado em acompanhamento.`;
+
+// SINAL
+const criarSinal = (jogo, mercado, odd) => `
+🚨⚽ SINAL CONFIRMADO
+
+🏟 ${jogo}
+📊 ${mercado}
+💰 Odd: ${odd}
+🎯 Unidade: 1
+⏱ Pré-jogo
+`;
+
+// GREEN / RED
+const GREEN = `🟢 GREEN`;
+const RED = `🔴 RED`;
+
+// RESULTADOS — 23:55
+const criarResultados = (greens, reds) => `
+📊 RESULTADOS DO DIA
+
+🟢 Greens: ${greens}
+🔴 Reds: ${reds}
+📈 Assertividade: 0%
+`;
+
+// BOA NOITE — 00:30
+const boaNoite = `🌙 BOA NOITE
+
+Obrigado a todos por acompanharem.`;
+
+// ==================
+// FUNÇÕES
+// ==================
+const enviar = (msg) => {
+  bot.sendMessage(CHANNEL_ID, msg);
+};
+
+const aleatorio = (arr) =>
+  arr[Math.floor(Math.random() * arr.length)];
+
+// ==================
+// AGENDAMENTOS
+// ==================
+
+// BOM DIA — 09:00
 cron.schedule("0 9 * * *", () => {
-  bot.sendMessage(channelId, "☀️ Bom dia! Bem-vindo ao Radar de Golos ⚽📊");
+  enviar(aleatorio(bomDiaMsgs));
 });
 
-// 12:30 — Lembrete
+// LEMBRETE — 12:30
 cron.schedule("30 12 * * *", () => {
-  bot.sendMessage(channelId, "⏰ Lembrete: fique atento aos sinais de hoje!");
+  enviar(lembrete);
 });
 
-// 14:30 — Sinal
-cron.schedule("30 14 * * *", () => {
-  bot.sendMessage(channelId, "📢 SINAL DO DIA\n\nJogo:\nMercado:\nOdd:\nUnidade:");
-});
-
-// 15:30 — Sinal
-cron.schedule("30 15 * * *", () => {
-  bot.sendMessage(channelId, "📢 NOVO SINAL DISPONÍVEL ⚽");
-});
-
-// 17:30 — Sinal
-cron.schedule("30 17 * * *", () => {
-  bot.sendMessage(channelId, "📢 MAIS UM SINAL AO VIVO ⚽");
-});
-
-// 18:30 — Sinal
-cron.schedule("30 18 * * *", () => {
-  bot.sendMessage(channelId, "📢 ÚLTIMO SINAL DA TARDE ⚽");
-});
-
-// 23:55 — Resultados do dia
+// RESULTADOS — 23:55 (exemplo com 0/0)
 cron.schedule("55 23 * * *", () => {
-  bot.sendMessage(channelId, "📊 RESULTADOS DO DIA\n\nGreens: X\nReds: X");
+  enviar(criarResultados(0, 0));
 });
 
-// 00:30 — Boa noite
+// BOA NOITE — 00:30
 cron.schedule("30 0 * * *", () => {
-  bot.sendMessage(channelId, "🌙 Boa noite! Amanhã há mais sinais 🚀");
+  enviar(boaNoite);
 });
+
+// ==================
+// TESTE MANUAL (opcional)
+// ==================
+// enviar(criarSinal("Lille vs Rennes", "Over 2.5 Golos", "1.67"));
+// enviar(GREEN);
+// enviar(RED);
+
+console.log("🤖 Bot Radar de Golos ativo 24/7");
