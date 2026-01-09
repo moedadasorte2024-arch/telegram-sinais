@@ -1,7 +1,9 @@
-import fetch from "node-fetch";
+import TelegramBot from "node-telegram-bot-api";
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const CHANNEL_ID = process.env.TELEGRAM_CHANNEL;
+
+const bot = new TelegramBot(BOT_TOKEN, { polling: false });
 
 async function sendSignal() {
   const message = `
@@ -15,22 +17,10 @@ Hora: 20:00
 
 🎯 Aposta disponível na ESC
 👉 LINK_AFILIADO_ESC
-`;
+  `;
 
-  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: CHANNEL_ID,
-      text: message
-    })
-  });
-
+  await bot.sendMessage(CHANNEL_ID, message);
   console.log("Sinal enviado com sucesso");
 }
 
-// ENVIA UM SINAL A CADA 6 HORAS (24/7)
-setInterval(sendSignal, 6 * 60 * 60 * 1000);
-
-// envia logo ao iniciar
 sendSignal();
