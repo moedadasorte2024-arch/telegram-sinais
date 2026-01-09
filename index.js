@@ -14,38 +14,58 @@ if (!BOT_TOKEN || !CHANNEL_ID) {
 
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 
-console.log("🤖 Bot iniciado com sucesso");
+// ====================
+// CONTADORES
+// ====================
+let greens = 0;
+let reds = 0;
 
 // ====================
 // COMANDOS MANUAIS
 // ====================
 bot.onText(/\/green/i, () => {
+  greens++;
   bot.sendMessage(CHANNEL_ID, "🟢 GREEN");
 });
 
 bot.onText(/\/red/i, () => {
+  reds++;
   bot.sendMessage(CHANNEL_ID, "🔴 RED");
 });
 
 bot.onText(/\/resultado/i, () => {
+  const total = greens + reds;
+  const assertividade = total > 0 ? ((greens / total) * 100).toFixed(1) : 0;
+
   bot.sendMessage(
     CHANNEL_ID,
-    "📊 RESULTADOS DO DIA\n\n🟢 GREEN\n🔴 RED"
+    `📊 RESULTADOS DO DIA\n
+🟢 Greens: ${greens}
+🔴 Reds: ${reds}
+🎯 Assertividade: ${assertividade}%`
   );
 });
 
 // ====================
-// CRON — BOM DIA
+// RESET DIÁRIO (00:00)
+// ====================
+cron.schedule("0 0 * * *", () => {
+  greens = 0;
+  reds = 0;
+});
+
+// ====================
+// BOM DIA
 // ====================
 cron.schedule("0 9 * * *", () => {
   bot.sendMessage(
     CHANNEL_ID,
-    "☀️ Bom dia!\nFiquem atentos aos sinais de hoje 🔔"
+    "☀️ Bom dia!\nMais um dia para buscar greens 💪"
   );
 });
 
 // ====================
-// CRON — SINAL
+// SINAL
 // ====================
 cron.schedule("30 14 * * *", () => {
   bot.sendMessage(
@@ -55,21 +75,28 @@ cron.schedule("30 14 * * *", () => {
 });
 
 // ====================
-// CRON — LEMBRETE
+// LEMBRETE
 // ====================
 cron.schedule("0 16 * * *", () => {
   bot.sendMessage(
     CHANNEL_ID,
-    "⏰ Lembrete\nGestão é a chave do sucesso 💰"
+    "⏰ Lembrete\nGestão de banca é essencial 📊"
   );
 });
 
 // ====================
-// CRON — BOA NOITE
+// BOA NOITE
 // ====================
-cron.schedule("0 23 * * *", () => {
+cron.schedule("55 23 * * *", () => {
+  const total = greens + reds;
+  const assertividade = total > 0 ? ((greens / total) * 100).toFixed(1) : 0;
+
   bot.sendMessage(
     CHANNEL_ID,
-    "🌙 Boa noite!\nObrigado por acompanharem 💙"
+    `🌙 Boa noite!\n
+🟢 Greens: ${greens}
+🔴 Reds: ${reds}
+🎯 Assertividade: ${assertividade}%\n
+Obrigado por acompanharem 💙`
   );
 });
