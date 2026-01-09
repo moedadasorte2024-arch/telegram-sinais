@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
-const CHANNEL_ID = process.env.CHANNEL_ID;
+const CHANNEL_ID = process.env.TELEGRAM_CHANNEL;
 
 async function sendSignal() {
   const message = `
@@ -26,8 +26,11 @@ Hora: 20:00
     })
   });
 
-  console.log("Sinal enviado");
+  console.log("Sinal enviado com sucesso");
 }
 
+// ENVIA UM SINAL A CADA 6 HORAS (24/7)
+setInterval(sendSignal, 6 * 60 * 60 * 1000);
+
+// envia logo ao iniciar
 sendSignal();
-setInterval(sendSignal, 8 * 60 * 60 * 1000); // 3 sinais por dia
