@@ -11,12 +11,12 @@ let greens = 0;
 let reds = 0;
 let agendados = [];
 
-// ================= FUNÇÃO ENVIAR =================
+// ===== FUNÇÃO DE ENVIO =====
 function send(text) {
   bot.sendMessage(CHANNEL_ID, text);
 }
 
-// ================= GREEN / RED =================
+// ===== GREEN / RED =====
 bot.onText(/\/green/i, (msg) => {
   greens++;
   bot.sendMessage(msg.chat.id, '🟢 GREEN');
@@ -27,36 +27,27 @@ bot.onText(/\/red/i, (msg) => {
   bot.sendMessage(msg.chat.id, '🔴 RED');
 });
 
-// ================= AGENDAR SINAL =================
+// ===== COMANDO /agenda =====
 bot.onText(/\/agenda (\d{2}:\d{2}) (.+)/i, (msg, match) => {
   const hora = match[1];
   const dados = match[2].split('|').map(t => t.trim());
 
   if (dados.length !== 3) {
-    bot.sendMessage(
-      msg.chat.id,
-      '❌ Usa:\n/agenda HH:MM Jogo | Mercado | Odd'
-    );
+    bot.sendMessage(msg.chat.id, '❌ Usa:\n/agenda HH:MM Jogo | Mercado | Odd');
     return;
   }
 
   const [jogo, mercado, odd] = dados;
   const jogoFormatado = jogo.replace(' vs ', ' 🆚 ');
 
-  agendados.push({
-    hora,
-    jogo: jogoFormatado,
-    mercado,
-    odd
-  });
-
+  agendados.push({ hora, jogo: jogoFormatado, mercado, odd });
   bot.sendMessage(msg.chat.id, `✅ Sinal agendado para ${hora}`);
 });
 
-// ================= VERIFICA CADA MINUTO =================
+// ===== VERIFICA A CADA MINUTO =====
 cron.schedule('* * * * *', () => {
   const agora = new Date();
-  const horaAtual = agora.toTimeString().slice(0, 5);
+  const horaAtual = agora.toTimeString().slice(0,5);
 
   agendados = agendados.filter(sinal => {
     if (sinal.hora === horaAtual) {
@@ -74,7 +65,7 @@ Odd: ${sinal.odd}
   });
 });
 
-// ================= MENSAGENS FIXAS =================
+// ===== MENSAGENS FIXAS =====
 
 // Bom dia
 cron.schedule('0 9 * * *', () => {
@@ -91,7 +82,7 @@ cron.schedule('30 12 * * *', () => {
 Os próximos sinais do Radar de Golos serão publicados em breve.`);
 });
 
-// Resultados do dia
+// Resultados
 cron.schedule('55 23 * * *', () => {
   const total = greens + reds;
   const acc = total > 0 ? ((greens / total) * 100).toFixed(2) : 0;
