@@ -1,102 +1,118 @@
 import TelegramBot from "node-telegram-bot-api";
 import cron from "node-cron";
+import express from "express";
 
-// ====================
+const app = express();
+app.get("/", (req, res) => res.send("Bot online"));
+app.listen(3000);
+
+// ========================
 // CONFIGURAÇÃO
-// ====================
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const CHANNEL_ID = process.env.BOT_CHANNEL;
+// ========================
+const TOKEN = process.env.BOT_TOKEN;
+const CHANNEL_ID = "@radardegolos";
 
-if (!BOT_TOKEN || !CHANNEL_ID) {
-  console.error("Variáveis de ambiente não definidas");
-  process.exit(1);
-}
+const bot = new TelegramBot(TOKEN, { polling: true });
 
-const bot = new TelegramBot(BOT_TOKEN, { polling: true });
-
-// ====================
+// ========================
 // CONTADORES
-// ====================
+// ========================
 let greens = 0;
 let reds = 0;
 
-// ====================
-// COMANDOS MANUAIS
-// ====================
-bot.onText(/\/green/i, () => {
+// ========================
+// COMANDOS MANUAIS (CHAT COM BOT)
+// ========================
+bot.onText(/\/green/, (msg) => {
   greens++;
-  bot.sendMessage(CHANNEL_ID, "🟢 GREEN");
+  bot.sendMessage(msg.chat.id, "🟢 GREEN");
 });
 
-bot.onText(/\/red/i, () => {
+bot.onText(/\/red/, (msg) => {
   reds++;
-  bot.sendMessage(CHANNEL_ID, "🔴 RED");
+  bot.sendMessage(msg.chat.id, "🔴 RED");
 });
 
-bot.onText(/\/resultado/i, () => {
+bot.onText(/\/resultado/, (msg) => {
   const total = greens + reds;
-  const assertividade = total > 0 ? ((greens / total) * 100).toFixed(1) : 0;
+  const accuracy = total > 0 ? ((greens / total) * 100).toFixed(0) : 0;
 
   bot.sendMessage(
-    CHANNEL_ID,
-    `📊 RESULTADOS DO DIA\n
-🟢 Greens: ${greens}
-🔴 Reds: ${reds}
-🎯 Assertividade: ${assertividade}%`
+    msg.chat.id,
+    `📊 Resultados do dia\n\n🟢 Greens: ${greens}\n🔴 Reds: ${reds}\n🎯 Assertividade: ${accuracy}%`
   );
 });
 
-// ====================
-// RESET DIÁRIO (00:00)
-// ====================
-cron.schedule("0 0 * * *", () => {
-  greens = 0;
-  reds = 0;
-});
+// ========================
+// MENSAGENS AUTOMÁTICAS
+// ========================
 
-// ====================
-// BOM DIA
-// ====================
+// 09:00 — Bom dia
 cron.schedule("0 9 * * *", () => {
   bot.sendMessage(
     CHANNEL_ID,
-    "☀️ Bom dia!\nMais um dia para buscar greens 💪"
+    "☀️ Bom dia!\n\nBem-vindo ao Radar de Golos.\nHoje seguimos focados e disciplinados."
   );
 });
 
-// ====================
-// SINAL
-// ====================
+// 12:30 — Lembrete
+cron.schedule("30 12 * * *", () => {
+  bot.sendMessage(
+    CHANNEL_ID,
+    "⏰ Lembrete\n\nGestão de banca é fundamental.\nAposte com responsabilidade."
+  );
+});
+
+// 14:30 — Sinal
 cron.schedule("30 14 * * *", () => {
   bot.sendMessage(
     CHANNEL_ID,
-    "⚽ SINAL\nOver 2.5\nOdd 1.75"
+    "⚽ SINAL\n\nJogo: Exemplo FC vs Teste FC\nMercado: Over 2.5\nOdd: 1.65"
   );
 });
 
-// ====================
-// LEMBRETE
-// ====================
-cron.schedule("0 16 * * *", () => {
+// 15:30 — Sinal
+cron.schedule("30 15 * * *", () => {
   bot.sendMessage(
     CHANNEL_ID,
-    "⏰ Lembrete\nGestão de banca é essencial 📊"
+    "⚽ SINAL\n\nJogo: Alpha FC vs Beta FC\nMercado: Ambas Marcam\nOdd: 1.70"
   );
 });
 
-// ====================
-// BOA NOITE
-// ====================
+// 17:30 — Sinal
+cron.schedule("30 17 * * *", () => {
+  bot.sendMessage(
+    CHANNEL_ID,
+    "⚽ SINAL\n\nJogo: City vs United\nMercado: Over 1.5\nOdd: 1.60"
+  );
+});
+
+// 18:30 — Sinal
+cron.schedule("30 18 * * *", () => {
+  bot.sendMessage(
+    CHANNEL_ID,
+    "⚽ SINAL\n\nJogo: Roma vs Milan\nMercado: Over 2.5\nOdd: 1.75"
+  );
+});
+
+// 23:55 — Resultados do dia
 cron.schedule("55 23 * * *", () => {
   const total = greens + reds;
-  const assertividade = total > 0 ? ((greens / total) * 100).toFixed(1) : 0;
+  const accuracy = total > 0 ? ((greens / total) * 100).toFixed(0) : 0;
 
   bot.sendMessage(
     CHANNEL_ID,
-    `🌙 Boa noite!\n
-🟢 Greens: ${greens}
-🔴 Reds: ${reds}
-🎯 Assertividade: ${assertividade}%\n
-Obrigado por acompanharem 💙`
+    `📊 Resultados do dia\n\n🟢 Greens: ${greens}\n🔴 Reds: ${reds}\n🎯 Assertividade: ${accuracy}%`
   );
+});
+
+// 00:30 — Boa noite + reset
+cron.schedule("30 0 * * *", () => {
+  bot.sendMessage(
+    CHANNEL_ID,
+    "🌙 Boa noite\n\nObrigado por acompanharem o Radar de Golos.\nAmanhã há mais!"
+  );
+
+  greens = 0;
+  reds = 0;
 });
