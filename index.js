@@ -4,7 +4,7 @@ import cron from "node-cron";
 // ==================
 // CONFIGURAÇÃO
 // ==================
-const BOT_TOKEN = process.env.BOT_TOKEN || "8576458884:AAGkn2Nrt2zY-56h-e1GaE12xnvogz12r90";
+const BOT_TOKEN = process.env.BOT_TOKEN || "COLOCA_AQUI_O_TEU_TOKEN";
 const CHANNEL_ID = "@radardegolos";
 
 const bot = new TelegramBot(BOT_TOKEN, { polling: false });
