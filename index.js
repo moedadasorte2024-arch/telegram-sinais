@@ -1,4 +1,5 @@
 import TelegramBot from "node-telegram-bot-api";
+import cron from "node-cron";
 
 const token = process.env.BOT_TOKEN;
 const channelId = "@radardegolos";
@@ -10,49 +11,48 @@ if (!token) {
 
 const bot = new TelegramBot(token, { polling: false });
 
-(async () => {
-  try {
-    console.log("A iniciar bot...");
-    await bot.sendMessage(channelId, "🤖 Bot iniciado com sucesso!");
-    console.log("Mensagem enviada. Bot OK.");
-    process.exit(0);
-  } catch (err) {
-    console.error("Erro:", err.message);
-    process.exit(1);
-  }
-})();
-let greens = 0;
-let reds = 0;
+console.log("🤖 Bot iniciado com sucesso");
 
-// Comandos de resultado
-bot.onText(/\/green/, (msg) => {
-  if (msg.chat.type === "private" || msg.chat.id === process.env.CHANNEL_ID) return;
-  greens++;
+// =====================
+// MENSAGENS AUTOMÁTICAS
+// =====================
+
+// 09:00 — Bom dia
+cron.schedule("0 9 * * *", () => {
+  bot.sendMessage(channelId, "☀️ Bom dia! Bem-vindo ao Radar de Golos ⚽📊");
 });
 
-bot.onText(/\/red/, (msg) => {
-  if (msg.chat.type === "private" || msg.chat.id === process.env.CHANNEL_ID) return;
-  reds++;
+// 12:30 — Lembrete
+cron.schedule("30 12 * * *", () => {
+  bot.sendMessage(channelId, "⏰ Lembrete: fique atento aos sinais de hoje!");
 });
 
-// Envio automático às 23:55
-cron.schedule('55 23 * * *', () => {
-  const total = greens + reds;
-  const taxa = total > 0 ? Math.round((greens / total) * 100) : 0;
+// 14:30 — Sinal
+cron.schedule("30 14 * * *", () => {
+  bot.sendMessage(channelId, "📢 SINAL DO DIA\n\nJogo:\nMercado:\nOdd:\nUnidade:");
+});
 
-  const mensagem = `
-📊 RESULTADO DO DIA — Radar de Golos
+// 15:30 — Sinal
+cron.schedule("30 15 * * *", () => {
+  bot.sendMessage(channelId, "📢 NOVO SINAL DISPONÍVEL ⚽");
+});
 
-✅ Greens: ${greens}
-❌ Reds: ${reds}
-📈 Taxa de acerto: ${taxa}%
+// 17:30 — Sinal
+cron.schedule("30 17 * * *", () => {
+  bot.sendMessage(channelId, "📢 MAIS UM SINAL AO VIVO ⚽");
+});
 
-Disciplina e gestão são a chave 📌
-`;
+// 18:30 — Sinal
+cron.schedule("30 18 * * *", () => {
+  bot.sendMessage(channelId, "📢 ÚLTIMO SINAL DA TARDE ⚽");
+});
 
-  bot.sendMessage(process.env.CHANNEL_ID, mensagem);
+// 23:55 — Resultados do dia
+cron.schedule("55 23 * * *", () => {
+  bot.sendMessage(channelId, "📊 RESULTADOS DO DIA\n\nGreens: X\nReds: X");
+});
 
-  // Reset diário
-  greens = 0;
-  reds = 0;
+// 00:30 — Boa noite
+cron.schedule("30 0 * * *", () => {
+  bot.sendMessage(channelId, "🌙 Boa noite! Amanhã há mais sinais 🚀");
 });
