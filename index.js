@@ -21,13 +21,13 @@ let greens = 0;
 let reds = 0;
 
 // ===============================
-// COMANDOS PRIVADOS (NÃO PUBLICA NO CANAL)
+// COMANDOS PRIVADOS (NÃO PUBLICA)
 // ===============================
-bot.onText(/\/green/, (msg) => {
+bot.onText(/\/green/, () => {
   greens++;
 });
 
-bot.onText(/\/red/, (msg) => {
+bot.onText(/\/red/, () => {
   reds++;
 });
 
@@ -53,46 +53,69 @@ Seguimos focados e disciplinados.
 }
 
 // ===============================
-// CRONS (HORA PORTUGAL - UTC)
+// CRONS — HORA PORTUGAL (UTC)
 // ===============================
 
-// Bom dia — 09:00
+// 09:00 — Bom dia
 cron.schedule("0 9 * * *", () => {
   bot.sendMessage(
     CHANNEL_ID,
-    "🌅 Bom dia!\nFica atento aos sinais do Radar de Golos."
+    "🌅 Bom dia!\n\nPreparação diária em andamento.\nFica atento aos sinais do Radar de Golos."
   );
 });
 
-// Lembrete — 12:30
+// 11:00 — Lembrete 1 (Preparação Premium)
+cron.schedule("0 11 * * *", () => {
+  bot.sendMessage(
+    CHANNEL_ID,
+    `🔔 PREPARAÇÃO DOS SINAIS | Radar de Golos
+
+Os sinais publicados no Radar de Golos são definidos com base em:
+
+• Análise do mercado e variação das odds
+• Estatísticas recentes e histórico das equipas
+• Tendência ofensiva e volume de golos
+• Contexto competitivo e forma atual
+
+⚠️ Aposte sempre com responsabilidade.`
+  );
+});
+
+// 11:30 — Casa de apostas oficial
+cron.schedule("30 11 * * *", () => {
+  bot.sendMessage(
+    CHANNEL_ID,
+    `🏦 CASA DE APOSTAS OFICIAL
+
+Os sinais do Radar de Golos são analisados com base nesta casa de apostas.
+
+👉 [APOSTAR AQUI](https://teulink.com)
+
+⚠️ Jogue com responsabilidade.`
+  );
+});
+
+// 12:30 — Lembrete 3
 cron.schedule("30 12 * * *", () => {
   bot.sendMessage(
     CHANNEL_ID,
-    "🔔 Atenção\nFica atento aos próximos sinais do Radar de Golos."
+    "🔔 Atenção\n\nOs próximos sinais do Radar de Golos serão publicados em breve."
   );
 });
 
-// Lembrete extra — 13:30
-cron.schedule("30 13 * * *", () => {
-  bot.sendMessage(
-    CHANNEL_ID,
-    "📢 Aviso\nOs sinais do Radar de Golos serão publicados em breve."
-  );
-});
-
-// Resultados do dia — 00:00
+// 00:00 — Resultados do dia
 cron.schedule("0 0 * * *", () => {
   enviarResultados();
   greens = 0;
   reds = 0;
 });
 
-// Boa noite — 01:00
+// 01:00 — Boa noite
 cron.schedule("0 1 * * *", () => {
   bot.sendMessage(
     CHANNEL_ID,
-    "🌙 Boa noite!\nObrigado por acompanharem 💙"
+    "🌙 Boa noite!\n\nObrigado por acompanharem o Radar de Golos 💙"
   );
 });
 
-console.log("🤖 Bot online e a funcionar");
+console.log("🤖 Bot online e totalmente operacional");
